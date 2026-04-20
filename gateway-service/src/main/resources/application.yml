@@ -1,0 +1,53 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        # User Service Routes - Public (No Auth Required)
+        - id: userservice-auth
+          uri: lb://userservice
+          predicates:
+            - Path=/login, /register, /api/users/register, /api/users/reset-password
+        
+        # User Service Routes - Protected (Auth Required)
+        - id: userservice-api
+          uri: lb://userservice
+          predicates:
+            - Path=/api/users/**, /api/roles/**, /api/modules/**, /api/functions/**, /api/permissions/**
+          filters:
+            - AuthenticationFilter
+        
+        # CMS Service Routes - Protected (Auth Required)
+        - id: cms-service
+          uri: lb://cms-service
+          predicates:
+            - Path=/api/content/**, /api/schema/**, /api/admin/**
+          filters:
+            - AuthenticationFilter
+
+        # Email Service Routes - Public (OTP Request/Verify)
+        - id: email-service
+          uri: lb://email-service
+          predicates:
+            - Path=/api/otp/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+    
+# Must match User Service JWT Secret
+jwt:
+  secret: DHJGY84FYFNFE7NV7YVTSNVTGTGGDR434F4FRDGGRGRG444F434RF

@@ -1,0 +1,117 @@
+{
+  "moduleCode": "ABOUT_US",
+  "displayName": "About Us",
+  "fields": [
+    {
+      "name": "Title",
+      "type": "text",
+      "label": "Page Title",
+      "required": true,
+      "placeholder": "Enter the main title",
+      "gridWidth": 2,
+      "validation": {
+        "minLength": 3,
+        "maxLength": 100,
+        "message": "Title must be between 3 and 100 characters"
+      }
+    },
+    {
+      "name": "Subtitle",
+      "type": "text",
+      "label": "Subtitle",
+      "required": false,
+      "placeholder": "Enter a subtitle or tagline",
+      "gridWidth": 2
+    },
+    {
+      "name": "Content",
+      "type": "rich-text",
+      "label": "Main Content",
+      "required": true,
+      "placeholder": "Write your about us content here...",
+      "gridWidth": 2
+    },
+    {
+      "name": "Mission",
+      "type": "textarea",
+      "label": "Mission Statement",
+      "required": false,
+      "placeholder": "Our mission is to...",
+      "gridWidth": 1,
+      "validation": {
+        "maxLength": 500
+      }
+    },
+    {
+      "name": "Vision",
+      "type": "textarea",
+      "label": "Vision Statement",
+      "required": false,
+      "placeholder": "Our vision is to...",
+      "gridWidth": 1,
+      "validation": {
+        "maxLength": 500
+      }
+    },
+    {
+      "name": "Founded_Year",
+      "type": "number",
+      "label": "Founded Year",
+      "required": false,
+      "placeholder": "e.g., 2020",
+      "gridWidth": 1,
+      "validation": {
+        "min": 1800,
+        "max": 2030
+      }
+    },
+    {
+      "name": "Email",
+      "type": "email",
+      "label": "Contact Email",
+      "required": false,
+      "placeholder": "contact@example.com",
+      "gridWidth": 1
+    },
+    {
+      "name": "Website",
+      "type": "url",
+      "label": "Website URL",
+      "required": false,
+      "placeholder": "https://example.com",
+      "gridWidth": 1
+    },
+    {
+      "name": "Banner_Image",
+      "type": "image",
+      "label": "Banner Image",
+      "required": false,
+      "placeholder": "Upload or paste image URL",
+      "gridWidth": 1
+    },
+    {
+      "name": "Team_Photo",
+      "type": "image",
+      "label": "Team Photo",
+      "required": false,
+      "placeholder": "Upload or paste image URL",
+      "gridWidth": 1
+    },
+    {
+      "name": "Published",
+      "type": "toggle",
+      "label": "Published",
+      "required": false,
+      "gridWidth": 1,
+      "defaultValue": true
+    },
+    {
+      "name": "Featured",
+      "type": "checkbox",
+      "label": "Featured on Homepage",
+      "required": false,
+      "gridWidth": 1,
+      "defaultValue": false
+    }
+  ]
+}

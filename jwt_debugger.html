@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JWT Token Debugger</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #007bff;
+        }
+        .token-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .result {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .error {
+            color: #dc3545;
+            background: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .success {
+            color: #155724;
+            background: #d4edda;
+            border-color: #c3e6cb;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 JWT Token Debugger</h1>
+        
+        <div class="section">
+            <h3>Current Token from LocalStorage</h3>
+            <button onclick="checkLocalStorageToken()">Check Current Token</button>
+            <div id="currentTokenResult" class="result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Manual Token Check</h3>
+            <textarea id="manualToken" class="token-input" rows="4" placeholder="Paste JWT token here..."></textarea>
+            <button onclick="checkManualToken()">Decode & Check</button>
+            <div id="manualTokenResult" class="result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Instructions</h3>
+            <ol>
+                <li>Login to your application in another tab</li>
+                <li>Come back here and click "Check Current Token"</li>
+                <li>This will show you the token details and expiration status</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function decodeJwt(token) {
+            try {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (error) {
+                return { error: 'Failed to decode: ' + error.message };
+            }
+        }
+
+        function formatDate(timestamp) {
+            return new Date(timestamp * 1000).toLocaleString();
+        }
+
+        function checkToken(token, resultElementId) {
+            const resultEl = document.getElementById(resultElementId);
+            
+            if (!token) {
+                resultEl.className = 'result error';
+                resultEl.textContent = 'No token found';
+                return;
+            }
+
+            const decoded = decodeJwt(token);
+            
+            if (decoded.error) {
+                resultEl.className = 'result error';
+                resultEl.textContent = decoded.error;
+                return;
+            }
+
+            const currentTime = Date.now();
+            const expirationTime = decoded.exp ? decoded.exp * 1000 : null;
+            const isExpired = expirationTime ? currentTime >= expirationTime : false;
+
+            let output = '=== TOKEN PAYLOAD ===\n';
+            output += JSON.stringify(decoded, null, 2);
+            output += '\n\n=== EXPIRATION CHECK ===\n';
+            output += `Has exp claim: ${decoded.exp ? 'YES' : 'NO'}\n`;
+            
+            if (decoded.exp) {
+                output += `Issued at: ${decoded.iat ? formatDate(decoded.iat) : 'Unknown'}\n`;
+                output += `Expires at: ${formatDate(decoded.exp)}\n`;
+                output += `Current time: ${new Date(currentTime).toLocaleString()}\n`;
+                output += `Time until expiration: ${expirationTime ? Math.floor((expirationTime - currentTime) / 1000 / 60) : 'N/A'} minutes\n`;
+                output += `\nSTATUS: ${isExpired ? '❌ EXPIRED' : '✅ VALID'}`;
+                
+                resultEl.className = isExpired ? 'result error' : 'result success';
+            } else {
+                output += 'WARNING: No expiration claim found!\n';
+                output += 'This token will be treated as VALID by the frontend.\n';
+                resultEl.className = 'result';
+            }
+
+            resultEl.textContent = output;
+        }
+
+        function checkLocalStorageToken() {
+            const token = localStorage.getItem('token');
+            checkToken(token, 'currentTokenResult');
+        }
+
+        function checkManualToken() {
+            const token = document.getElementById('manualToken').value.trim();
+            checkToken(token, 'manualTokenResult');
+        }
+
+        // Auto-check on page load
+        window.onload = function() {
+            setTimeout(checkLocalStorageToken, 500);
+        };
+    </script>
+</body>
+</html>
