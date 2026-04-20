@@ -47,6 +47,7 @@ Thumbs.db
 node_modules/
 dist/
 .env.local
+*.lockb
 .env.production
 
 # Environment files (NEVER commit secrets)
